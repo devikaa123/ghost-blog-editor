@@ -2,14 +2,13 @@
   "name": "ghost-blog-editor",
   "version": "0.1.0",
   "private": true,
-    "dependencies": {
+  "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@tiptap/react": "^2.1.13",
     "@tiptap/starter-kit": "^2.1.13",
-    "@tiptap/extension-image": "^2.1.13",
     "@tiptap/extension-link": "^2.1.13",
     "@tiptap/extension-text-align": "^2.1.13",
     "@tiptap/extension-underline": "^2.1.13",
