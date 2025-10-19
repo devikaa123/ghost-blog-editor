@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import useEditorStore from '../stores/useEditorStore'
+import useEditorStore from '../../stores/useEditorStore'
 
 const PostCreator = () => {
   const [title, setTitle] = useState('')

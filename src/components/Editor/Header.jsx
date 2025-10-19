@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
+  const [saveStatus, setSaveStatus] = useState('Draft - Saved');
+
+  useEffect(() => {
+    const checkSaveStatus = () => {
+      const statusElement = document.getElementById('save-status');
+      if (statusElement) {
+        setSaveStatus(statusElement.textContent);
+      }
+    };
+
+    checkSaveStatus();
+    const interval = setInterval(checkSaveStatus, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleBackToPosts = () => {
     navigate('/');
@@ -10,7 +24,7 @@ const Header = () => {
 
   return (
     <div className="header" style={{
-      width: '1238px',
+      width: '1238px', // Keep original width
       height: '36px',
       display: 'flex',
       justifyContent: 'space-between',
@@ -19,7 +33,7 @@ const Header = () => {
     }}>
       {/* Left Section */}
       <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {/* Arrow Button - Now functional */}
+        {/* Arrow Button */}
         <button 
           onClick={handleBackToPosts}
           style={{
@@ -56,20 +70,21 @@ const Header = () => {
           Posts
         </span>
 
+        {/* Dynamic Save Status */}
         <span style={{
-          width: '89px',
+          width: 'auto',
           height: '20px',
           fontFamily: 'Inter, sans-serif',
           fontWeight: '400',
           fontSize: '14px',
           lineHeight: '20px',
-          color: '#666'
+          color: saveStatus === 'Saving...' ? '#666' : '#666'
         }}>
-          Draft - Saved
+          {saveStatus}
         </span>
       </div>
 
-      {/* Right Section - unchanged */}
+      {/* Right Section */}
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {/* Menu Button */}
         <button style={{
