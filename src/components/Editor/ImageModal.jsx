@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -10,15 +11,24 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
     }
   }, [isOpen]);
 
-  const fetchImages = async () => {
+  const fetchImages = async (search = '') => {
     setLoading(true);
     try {
-      const response = await fetch('https://picsum.photos/v2/list?page=1&limit=12');
+      let url = 'https://picsum.photos/v2/list?page=1&limit=20';
+      
+      const response = await fetch(url);
       const data = await response.json();
-      setImages(data);
+      
+      // Format the images with proper URLs
+      const formattedImages = data.map(img => ({
+        ...img,
+        download_url: img.download_url.replace('/id/', '/id/600/400/')
+      }));
+      
+      setImages(formattedImages);
     } catch (error) {
       console.error('Error fetching images:', error);
-      // Fallback to some default images if API fails
+      // Fallback to default images if API fails
       setImages(Array.from({ length: 12 }, (_, i) => ({
         id: i,
         download_url: `https://picsum.photos/600/400?random=${i}`,
@@ -27,6 +37,14 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
     }
     setLoading(false);
   };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredImages = images.filter(image =>
+    image.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (!isOpen) return null;
 
@@ -48,7 +66,7 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
         borderRadius: '12px',
         padding: '24px',
         width: '90%',
-        maxWidth: '800px',
+        maxWidth: '900px',
         maxHeight: '80vh',
         overflow: 'auto'
       }}>
@@ -75,6 +93,30 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Search images..."
+            value={searchTerm}
+            onChange={handleSearch}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '1px solid #D1D5DB',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none'
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#3B82F6';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#D1D5DB';
+            }}
+          />
+        </div>
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <div>Loading images...</div>
@@ -85,7 +127,7 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
             gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
             gap: '16px'
           }}>
-            {images.map((image) => (
+            {filteredImages.map((image) => (
               <div
                 key={image.id}
                 style={{
@@ -95,7 +137,7 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
                   border: '2px solid transparent',
                   transition: 'all 0.2s ease'
                 }}
-                onClick={() => onSelectImage(image.download_url)}
+                onClick={() => onSelectImage(image.download_url.replace('/600/400/', '/1200/800/'))}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#3B82F6';
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -106,13 +148,17 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
                 }}
               >
                 <img
-                  src={image.download_url.replace('/id/', '/id/300/200/')}
+                  src={image.download_url}
                   alt={`By ${image.author}`}
                   style={{
                     width: '100%',
                     height: '150px',
                     objectFit: 'cover',
                     display: 'block'
+                  }}
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    e.target.src = `https://picsum.photos/300/200?random=${image.id}`;
                   }}
                 />
                 <div style={{
@@ -125,6 +171,12 @@ const ImageModal = ({ isOpen, onClose, onSelectImage }) => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {filteredImages.length === 0 && !loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
+            No images found. Try a different search term.
           </div>
         )}
       </div>

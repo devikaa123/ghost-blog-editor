@@ -15,6 +15,8 @@ const EnhancedEditor = () => {
   const [linkUrl, setLinkUrl] = useState('');
   const [showFormattingToolbar, setShowFormattingToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+    const [titleOpacity, setTitleOpacity] = useState(0.1);
+
   const editorRef = useRef(null);
   const toolbarRef = useRef(null);
 
